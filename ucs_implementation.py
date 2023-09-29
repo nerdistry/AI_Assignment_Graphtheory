@@ -52,9 +52,24 @@ visited_list = list(visited_set)
 
 
 node_col = ['pink' if not node in visited_list else 'purple' for node in G.nodes()]
-green_colored_edges = list(zip(visited_list, visited_list[1:]))
 
-edge_col = ["pink" if not edge in green_colored_edges else 'purple' for edge in G.edges()]
+green_colored_edges = list(zip(visited_list, visited_list[1:]))
+black_colored_edges = list(zip(route_ucs.shortest_path, route_ucs.shortest_path[1:]))
+
+# TODO: note there is still a bug here, I want paths visited but not used
+# to be in red, I should probably use itertools.permutation() but let's see if this gets merged
+edge_col = []
+for edge in G.edges():
+    if not edge in black_colored_edges and edge_col not in green_colored_edges:
+        edge_col.append("green")
+    elif edge in black_colored_edges:
+        # shortest path to the destination
+        edge_col.append("black")
+    elif edge in green_colored_edges:
+        edge_col.append("red")
+# edge_col = ["green" if not edge in green_colored_edges else 'red' for edge in G.edges()]
+arc_weight = nx.get_edge_attributes(G, 'weight')
+
 arc_weight = nx.get_edge_attributes(G,'weight')
 nx.draw_networkx(G,node_pos,node_color=node_col,node_size=3500)
 nx.draw_networkx_edges(G,node_pos,edge_color=edge_col,width=2)
